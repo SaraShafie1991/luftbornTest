@@ -42,15 +42,20 @@ class SaveImageToFileWorker(ctx: Context, params: WorkerParameters) : Worker(ctx
                 resolver.openInputStream(Uri.parse(resourceUri))
             )
             val imageUrl = MediaStore.Images.Media.insertImage(
-                resolver, bitmap, Title, dateFormatter.format(Date())
-            )
-//            if (!imageUrl.isNullOrEmpty()) {
-            val output = workDataOf(
-                KEY_IMAGE_URI to imageUrl,
-                KEY_TASK_NAME to taskName
-            )
+                resolver, bitmap, Title + "IMG_" + Calendar.getInstance().getTime(), dateFormatter.format(Date()))
 
-            Result.success(output)
+            if (!imageUrl.isNullOrEmpty()) {
+                val output = workDataOf(
+                    KEY_IMAGE_URI to imageUrl,
+                    KEY_TASK_NAME to taskName
+                )
+
+                Result.success(output)
+            } else {
+                Log.e(TAG, "Writing to MediaStore failed")
+                Result.failure()
+            }
+
         } catch (exception: Exception) {
             exception.printStackTrace()
             Result.failure()
