@@ -49,7 +49,6 @@ class SaveImageToFileWorker(ctx: Context, params: WorkerParameters) : Worker(ctx
                     KEY_IMAGE_URI to imageUrl,
                     KEY_TASK_NAME to taskName
                 )
-
                 Result.success(output)
             } else {
                 Log.e(TAG, "Writing to MediaStore failed")
