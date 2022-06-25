@@ -9,7 +9,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.luftborntest.core.common.KEY_IMAGE_URI
-import com.luftborntest.core.common.TAG_OUTPUT_NAME
+import com.luftborntest.core.common.KEY_TASK_NAME
 import com.luftborntest.utils.makeStatusNotification
 import com.luftborntest.utils.sleep
 import java.text.SimpleDateFormat
@@ -19,6 +19,7 @@ import java.util.*
  * Saves the image to a permanent file
  */
 private const val TAG = "SaveImageToFileWorker"
+
 class SaveImageToFileWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
 
     private val Title = "Blurred Image"
@@ -36,20 +37,20 @@ class SaveImageToFileWorker(ctx: Context, params: WorkerParameters) : Worker(ctx
         val resolver = applicationContext.contentResolver
         return try {
             val resourceUri = inputData.getString(KEY_IMAGE_URI)
-            val taskName = inputData.getString(TAG_OUTPUT_NAME)
+            val taskName = inputData.getString(KEY_TASK_NAME)
             val bitmap = BitmapFactory.decodeStream(
-                resolver.openInputStream(Uri.parse(resourceUri)))
+                resolver.openInputStream(Uri.parse(resourceUri))
+            )
             val imageUrl = MediaStore.Images.Media.insertImage(
-                resolver, bitmap, Title, dateFormatter.format(Date()))
-            if (!imageUrl.isNullOrEmpty()) {
-                val output = workDataOf(KEY_IMAGE_URI to imageUrl,
-                    TAG_OUTPUT_NAME to taskName)
+                resolver, bitmap, Title, dateFormatter.format(Date())
+            )
+//            if (!imageUrl.isNullOrEmpty()) {
+            val output = workDataOf(
+                KEY_IMAGE_URI to imageUrl,
+                KEY_TASK_NAME to taskName
+            )
 
-                Result.success(output)
-            } else {
-                Log.e(TAG, "Writing to MediaStore failed")
-                Result.failure()
-            }
+            Result.success(output)
         } catch (exception: Exception) {
             exception.printStackTrace()
             Result.failure()

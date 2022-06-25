@@ -9,6 +9,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.luftborntest.core.common.KEY_IMAGE_URI
+import com.luftborntest.core.common.KEY_TASK_NAME
 import com.luftborntest.utils.blurBitmap
 import com.luftborntest.utils.makeStatusNotification
 import com.luftborntest.utils.sleep
@@ -21,6 +22,8 @@ class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
         val appContext = applicationContext
 
         val resourceUri = inputData.getString(KEY_IMAGE_URI)
+
+        val TaskName = inputData.getString(KEY_TASK_NAME)
 
         makeStatusNotification("Blurring image", appContext)
 
@@ -43,7 +46,8 @@ class BlurWorker(ctx: Context, params: WorkerParameters) : Worker(ctx, params) {
             // Write bitmap to a temp file
             val outputUri = writeBitmapToFile(appContext, output)
 
-            val outputData = workDataOf(KEY_IMAGE_URI to outputUri.toString())
+            val outputData = workDataOf(KEY_IMAGE_URI to outputUri.toString(),
+                KEY_TASK_NAME to TaskName)
 
             Result.success(outputData)
         } catch (throwable: Throwable) {
