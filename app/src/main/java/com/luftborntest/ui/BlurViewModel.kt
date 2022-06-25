@@ -11,6 +11,7 @@ import androidx.work.*
 import com.luftborntest.core.common.IMAGE_MANIPULATION_WORK_NAME
 import com.luftborntest.core.common.KEY_IMAGE_URI
 import com.luftborntest.core.common.TAG_OUTPUT
+import com.luftborntest.core.common.TAG_OUTPUT_NAME
 import com.luftborntest.utils.workers.BlurWorker
 import com.luftborntest.utils.workers.CleanupWorker
 import com.luftborntest.utils.workers.SaveImageToFileWorker
@@ -18,12 +19,14 @@ import com.luftborntest.utils.workers.SaveImageToFileWorker
 class BlurViewModel(application: Application) : ViewModel() {
 
     private var imageUri: Uri? = null
+    private var taskName: String? = null
     internal var outputUri: Uri? = null
     private val workManager = WorkManager.getInstance(application)
-    internal val outputWorkInfos: LiveData<List<WorkInfo>> = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT)
+    val outputWorkInfos: LiveData<List<WorkInfo>>
 
     init {
         imageUri = getImageUri(application.applicationContext)
+        outputWorkInfos = workManager.getWorkInfosByTagLiveData(TAG_OUTPUT)
     }
 
     internal fun cancelWork() {
@@ -34,50 +37,52 @@ class BlurViewModel(application: Application) : ViewModel() {
      * Creates the input data bundle which includes the Uri to operate on
      * @return Data which contains the Image Uri as a String
      */
-    private fun createInputDataForUri(): Data {
+    private fun createInputDataForUri(str: String): Data {
         val builder = Data.Builder()
         imageUri?.let {
             builder.putString(KEY_IMAGE_URI, imageUri.toString())
         }
+        builder.putString(TAG_OUTPUT_NAME, str)
         return builder.build()
     }
 
     /**
      * Create the WorkRequest to apply the blur and save the resulting image
-     * @param blurLevel The amount to blur the image
+     * @param blurLevel The amount to blur the image let it 3 to take long time
      */
-    internal fun applyBlur(blurLevel: Int) {
+    internal fun applyBlur(str: String) {
+        // single work
+//        workManager.enqueue(OneTimeWorkRequest.from(BlurWorker::class.java))
+
+        //one work based on input and output
+//        val blurRequest = OneTimeWorkRequestBuilder<BlurWorker>()
+//            .setInputData(createInputDataForUri())
+//            .build()
+//
+//        workManager.enqueue(blurRequest)
+
+        // Add WorkRequest to Cleanup temporary images
         var continuation = workManager
-            .beginUniqueWork(
-                IMAGE_MANIPULATION_WORK_NAME,
-                ExistingWorkPolicy.REPLACE,
-                OneTimeWorkRequest.from(CleanupWorker::class.java)
+            .beginWith(
+                OneTimeWorkRequest
+                    .from(CleanupWorker::class.java)
             )
 
-        // Add WorkRequests to blur the image the number of times requested
-        for (i in 0 until blurLevel) {
-            val blurBuilder = OneTimeWorkRequestBuilder<BlurWorker>()
-
-            // Input the Uri if this is the first blur operation
-            // After the first blur operation the input will be the output of previous
-            // blur operations.
-            if (i == 0) {
-                blurBuilder.setInputData(createInputDataForUri())
-            }
-
-            continuation = continuation.then(blurBuilder.build())
-        }
-
-        // Create charging constraint
-        val constraints = Constraints.Builder()
-            .setRequiresCharging(true)
+        // one request
+        // Add WorkRequest to blur the image
+        val blurRequest = OneTimeWorkRequest.Builder(BlurWorker::class.java)
+            .setInputData(createInputDataForUri(str))
             .build()
+
+        continuation = continuation.then(blurRequest)
+
 
         // Add WorkRequest to save the image to the filesystem
-        val save = OneTimeWorkRequestBuilder<SaveImageToFileWorker>()
-            .setConstraints(constraints)
+        val save = OneTimeWorkRequest
+            .Builder(SaveImageToFileWorker::class.java)
             .addTag(TAG_OUTPUT)
             .build()
+
         continuation = continuation.then(save)
 
         // Actually start the work

@@ -9,6 +9,7 @@ import androidx.work.Worker
 import androidx.work.WorkerParameters
 import androidx.work.workDataOf
 import com.luftborntest.core.common.KEY_IMAGE_URI
+import com.luftborntest.core.common.TAG_OUTPUT_NAME
 import com.luftborntest.utils.makeStatusNotification
 import com.luftborntest.utils.sleep
 import java.text.SimpleDateFormat
@@ -35,12 +36,14 @@ class SaveImageToFileWorker(ctx: Context, params: WorkerParameters) : Worker(ctx
         val resolver = applicationContext.contentResolver
         return try {
             val resourceUri = inputData.getString(KEY_IMAGE_URI)
+            val taskName = inputData.getString(TAG_OUTPUT_NAME)
             val bitmap = BitmapFactory.decodeStream(
                 resolver.openInputStream(Uri.parse(resourceUri)))
             val imageUrl = MediaStore.Images.Media.insertImage(
                 resolver, bitmap, Title, dateFormatter.format(Date()))
             if (!imageUrl.isNullOrEmpty()) {
-                val output = workDataOf(KEY_IMAGE_URI to imageUrl)
+                val output = workDataOf(KEY_IMAGE_URI to imageUrl,
+                    TAG_OUTPUT_NAME to taskName)
 
                 Result.success(output)
             } else {

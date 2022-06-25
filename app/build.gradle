@@ -10,6 +10,11 @@ android {
 
     defaultConfig {
         applicationId Android.applicationId
+        renderscriptTargetApi 11
+        renderscriptSupportModeEnabled true
+        vectorDrawables {
+            useSupportLibrary true
+        }
         minSdk Android.minSDK
         targetSdk Android.targetSDK
         versionCode Android.versionCode
