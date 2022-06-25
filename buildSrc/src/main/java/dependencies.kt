@@ -1,4 +1,7 @@
 object Versions {
+    val ACTIVITY = "1.4.0"
+    val WORK = "2.7.1"
+    val RECYCLER = "1.2.1"
     val KOTLIN = "1.3.72"
     val COMPILE_SDK = 32
     val MIN_SDK_VERSION = 21
@@ -14,12 +17,12 @@ object Versions {
     val APP_COMPAT_VERSION = "1.3.0"
     val CORE_KTX = "1.1.0"
     val ARCH_CORE_TESTING_VER = "2.0.0"
-    val TEST_RUNNER_VER = "1.1.0"
+    val TEST_RUNNER_VER = "1.4.0"
     val RULES_VER = "1.1.0"
     val TRUTH_VER = "1.1.0"
     val JUNIT_EXT_VER = "1.1.0"
     val MATERIAL_VERSION = "1.2.1"
-    val MOCKITO = "3.11.2"
+    val MOCKITO = "4.3.1"
     val MULTIDEX = "1.0.3"
     val JACOCO = "0.16.0"
     val HILT = "2.37"
@@ -28,7 +31,7 @@ object Versions {
     val RETROFIT_VERSION = "2.7.1"
     val OKHTTP_LOGGING_INTERCEPTOR_VERSION = "4.9.3"
     val GSON_CONVERTER = "2.6.1"
-    val ESPRESSO = "3.1.0"
+    val ESPRESSO = "3.4.0"
     val GOOGLE_MAP = "17.0.0"
     val LOCATION_SERVICES = "15.0.1"
     val TIMBER  = "4.7.1"
@@ -48,10 +51,13 @@ object Android {
     val versionCode = Versions.VERSION_CODE
     val versionName = Versions.VERSION_NAME
     val compileSDK = Versions.COMPILE_SDK
-    val applicationId = "com.hiltapplication"
+    val applicationId = "com.luftborntest"
 }
 
 object Libs {
+    val activityKts = "androidx.activity:activity-ktx:${Versions.ACTIVITY}"
+    val workManager = "androidx.work:work-runtime-ktx:${Versions.WORK}"
+    val recyclerview = "androidx.recyclerview:recyclerview:${Versions.RECYCLER}"
     val kotlinStdLib = "org.jetbrains.kotlin:kotlin-stdlib-jdk7:${Versions.KOTLIN}"
     val rxVersion = "io.reactivex.rxjava2:rxjava:${Versions.RXJAVA_VERSION}"
     val rxAndroid = "io.reactivex.rxjava2:rxandroid:${Versions.RX_ANDROID}"
@@ -79,10 +85,11 @@ object Libs {
 }
 
 object TestLibs {
-    val junit = "junit:junit:4.13"
+    val junit = "junit:junit:4.13.2"
     val espresso = "androidx.test.espresso:espresso-core:${Versions.ESPRESSO}"
     val archCoreTesting = "androidx.arch.core:core-testing:${Versions.ARCH_CORE_TESTING_VER}"
     val testRunner = "androidx.test:runner:${Versions.TEST_RUNNER_VER}"
+    val coreKtx = "androidx.test:core-ktx:${Versions.TEST_RUNNER_VER}"
     val rules = "androidx.test:rules:${Versions.RULES_VER}"
     val truth = "androidx.test.ext:truth:${Versions.TRUTH_VER}"
     val junitExt = "androidx.test.ext:junit:${Versions.JUNIT_EXT_VER}"
